@@ -16,21 +16,20 @@ Release Notes
 /* [Hidden] */
 $fn = 64;
 // presets based on the catalog of zinc-die cast kp-series of Kugellager https://www.kugellager-express.de/silver-series-miniature-plummer-block-housing-unit-kp08-shaft-8-mm
-// presets with parameters [ d, h, A, W, H, T, E, D, C, B, S, J ]
-sk8  = [8, 20, 21, 42, 32.8, 6, 18, 5, 32, 14, 5.5, 4] ;
-sk10 = [10, 20, 21, 42, 32.8, 6, 18, 5, 32, 14, 5.5, 4]; 
-sk12 = [12, 23, 21, 42, 38, 6, 20, 5, 32, 14, 5.5, 4];
-sk13 = [13, 23, 21, 42, 38, 6, 20, 5, 32, 14, 5.5, 4]; 
-sk16 = [16, 27, 24, 48, 44, 8, 25, 5, 38, 16, 5.5, 4];
-sk20 = [20, 31, 30, 60, 51, 10, 30, 7.5, 45, 20, 6.6, 5];
-sk25 = [25, 35, 35, 70, 60, 12, 38, 7, 56, 24, 6.6, 6]; 
-sk30 = [30, 42, 42, 84, 70, 12, 44, 10, 64, 28, 9, 6]; 
-sk35 = [35, 50, 49, 98, 85, 15, 50, 12, 74, 32, 11, 8];
-sk40 = [40, 60, 57, 114, 96, 15, 60, 12, 90, 36, 11, 8];
-presets = [[], sk8, sk10, sk12, sk13, sk16, sk20, sk25, sk30, sk35, sk40];
-/* [Select SK support preset] */
+// presets with parameters [ d, h, a, e, b, s, g, w, L, n, ds]
+kp08  = [8, 15, 55, 42, 13, 4.8, 5, 29, 11.5, 3.5, "M4"] ;
+kp000 = [10, 18, 67, 53, 16, 7, 6, 35, 14, 4, "M6"]; 
+kp001 = [12, 19, 71, 56, 16, 7, 6, 38, 14.5, 4, "M6"];
+kp002 = [15, 22, 80, 63, 16, 7, 7, 43, 16.5, 4.5, "M6"]; 
+kp003 = [17, 24, 85, 67, 18, 7, 7, 47, 17.5, 5, "M6"];
+kp004 = [20, 28, 100, 80, 20, 10, 9, 55, 21, 6, "M8"];
+kp005 = [25, 32, 112, 90, 20, 10, 10, 62, 22.5, 6, "M8"]; 
+kp006 = [30, 36, 132, 106, 26, 11, 11, 70, 24.5, 6.5, "M10"]; 
+kp007 = [35, 40, 150, 118, 26, 13, 13, 80, 29.5, 7, "M10"];
+presets = [[], kp08, kp000, kp001, kp002, kp003, kp004, kp005, kp006, kp007];
+/* [Select KP support preset] */
 // If don't want to use a preset, choose "custom"
-preset = 0; // [0:custom, 1:sk08, 2:sk10, 3:sk12, 4:sk13, 5:sk16, 6:sk20, 7:sk25, 8:sk30, 9:sk35, 10:sk40]
+preset = 0; // [0:custom, 1:kp08, 2:kp000, 3:kp001, 4:kp002, 5:kp003, 6:kp004, 7:kp005, 8:kp006, 9:kp007]
 echo(preset);
 /* [Custom dimensions] */
 // shaft diameter
@@ -50,7 +49,7 @@ b = 13;
 // locking bolts hole diameter
 s = 4.8;
 // Grub Screw metric size
-J = 4;
+ds = "M4";
 // half the bearing thickness
 n = 3.5;
 // size of the bearing clamping boss
@@ -61,11 +60,35 @@ L = 11.5;
 clearance = 0.1;
 //bolt counterbore shape
 bolt_counterbore_shape = "conical"; // [conical, hex, cylindrical]
+// -------------------------------------------------------------------
+
+// shaft diameter
+this_d = preset != 0 ? presets[preset][0] : d;   
+// heigth of the shaft
+this_h = preset != 0? presets[preset][1] : h;
+// total width of the block
+this_a = preset != 0 ? presets[preset][2] : a;
+// distance between bolts
+this_e = preset != 0 ? presets[preset][3] : e;
+// thickness of support
+this_b = preset != 0 ? presets[preset][4] : b;
+// locking bolts hole diameter
+this_s = preset != 0 ? presets[preset][5] : s;
+// base tickness
+this_g = preset != 0 ? presets[preset][6] : g;
+// total height
+this_W = preset != 0 ? presets[preset][7] : W;
+// size of the bearing clamping boss
+this_L = preset != 0 ? presets[preset][8] : L;
+// half the bearing thickness
+this_n = preset != 0 ? presets[preset][9] : n;
+// Grub Screw metric size
+this_ds = preset != 0 ? presets[preset][10] : ds;
 
 difference(){
     union(){
-        translate([0,0,g/2])cube([a,b,g], center = true);
-        translate([0, 0, h])rotate([90,0,0]) cylinder(r = W/2, h = b, center = true); 
+        translate([0, 0, this_g/2])cube([this_a, this_b, this_g], center = true);
+        translate([0, 0, this_W/2])rotate([90,0,0]) cylinder(r = this_W/2, h = this_b, center = true); 
     }
     
 }
