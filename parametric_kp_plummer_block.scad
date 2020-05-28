@@ -6,10 +6,9 @@ Release Notes
 
 08/05/2020 -> Version 1.0.0
         Features:
-            - 10 possibles presets(sk8 to sk40) of SAMICK-like SK shaft supports
-            - Custom mode, generate a suport with arbitrary dimensions 
+            - 9 possibles presets(kp08 to kp007) of Zinc-die cast kp-series
+            - Custom mode, generate a plummer block with arbitrary dimensions 
             - All holes with countersink or counterbore
-            - Clamping with bolt and nut (with nut housing)
 */
 
 
@@ -30,7 +29,6 @@ presets = [[], kp08, kp000, kp001, kp002, kp003, kp004, kp005, kp006, kp007];
 /* [Select KP support preset] */
 // If don't want to use a preset, choose "custom"
 preset = 0; // [0:custom, 1:kp08, 2:kp000, 3:kp001, 4:kp002, 5:kp003, 6:kp004, 7:kp005, 8:kp006, 9:kp007]
-echo(preset);
 /* [Custom dimensions] */
 // shaft diameter
 d = 8;    
@@ -48,7 +46,7 @@ e = 42;
 b = 13;
 // locking bolts hole diameter
 s = 4.8;
-// Grub Screw metric size
+// Bold metric size
 ds = "M4";
 // half the bearing thickness
 n = 3.5;
@@ -59,7 +57,7 @@ L = 11.5;
 // clearance
 clearance = 0.1;
 //bolt counterbore shape
-bolt_counterbore_shape = "conical"; // [conical, hex, cylindrical]
+bolt_counterbore_shape = "conical"; // [none, conical, hex, cylindrical]
 // -------------------------------------------------------------------
 
 // shaft diameter
@@ -82,13 +80,41 @@ this_W = preset != 0 ? presets[preset][7] : W;
 this_L = preset != 0 ? presets[preset][8] : L;
 // half the bearing thickness
 this_n = preset != 0 ? presets[preset][9] : n;
-// Grub Screw metric size
-this_ds = preset != 0 ? presets[preset][10] : ds;
+// Bolt metric size
+this_ds = preset != 0 ? ord(presets[preset][10][1]) - ord("0") : ord(ds[1]) - ord("0");
 
 difference(){
     union(){
-        translate([0, 0, this_g/2])cube([this_a, this_b, this_g], center = true);
-        translate([0, 0, this_W/2])rotate([90,0,0]) cylinder(r = this_W/2, h = this_b, center = true); 
+        translate([0, 0, this_g/2]) 
+            cube([this_a, this_b, this_g], center = true);
+        translate([0, 0, this_W/2]) 
+            rotate([90,0,0]) 
+                cylinder(r = this_W/2, h = this_b, center = true); 
+    }
+    // bearing seat
+    translate([0, 0, this_W/2]) 
+        rotate([90,0,0]) 
+            cylinder(r = this_W/3, h = this_b, center = true);
+    
+    // Bolt holes
+    translate([this_e/2, 0, this_g/2]) 
+        cylinder(r = this_s/2, h = this_g, center = true);
+    translate([-this_e/2, 0, this_g/2]) 
+        cylinder(r = this_s/2, h = this_g, center = true);
+    
+    // Bolt counterbore
+    if(bolt_counterbore_shape == "conical"){
+        translate([this_e/2,0,this_g-0.25*this_ds]) 
+            cylinder(r1= 0.5*this_ds,r2 = this_ds, h = 0.5*this_ds, center = true);
+        translate([-this_e/2,0,this_g-0.25*this_ds]) 
+            cylinder(r1= 0.5*this_ds,r2 = this_ds, h = 0.5*this_ds, center = true);
+    } else if( bolt_counterbore_shape == "cylindrical"){
+        translate([this_e/2,0,this_g - 0.25*this_ds]) 
+            cylinder(r = this_ds, h = 0.5*this_ds, center = true);
+        translate([-this_e/2,0,this_g - 0.25*this_ds]) 
+            cylinder(r = this_ds, h = 0.5*this_ds, center = true);
+    } else if( bolt_counterbore_shape == "hex") {
+        
     }
     
 }
