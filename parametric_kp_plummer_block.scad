@@ -99,6 +99,9 @@ module counterbore(shape, translate_vector, rotate_vector, hole_diameter) {
 // Sphered outer surface radius
 sphere_r = sqrt(pow(this_b, 2)/4 + pow(this_W/2, 2));
 
+// bearing outer diameter
+D = 2*this_W/3;
+
 difference(){
     // initial block
     union(){
@@ -119,10 +122,12 @@ difference(){
         translate([0, 0, -(sphere_r - this_W/2)/2]) 
                 cube([this_a, this_b, sphere_r - this_W/2], center = true);
     }
+    
     // bearing seat
     translate([0, 0, this_W/2]) 
         rotate([90,0,0]) 
-            cylinder(r = this_W/3 + clearance, h = this_b, center = true);
+            cylinder(r = D/2 + clearance, h = this_b, center = true);
+    
     // Bolt holes
     translate([this_e/2, 0, this_g/2]) 
         cylinder(r = this_s/2, h = this_g, center = true);
@@ -130,13 +135,10 @@ difference(){
         cylinder(r = this_s/2, h = this_g, center = true);
     
     // Bolt counterbore
-    if(bolt_counterbore_shape == "conical"){
-        counterbore("conical", [this_e/2,0,this_g-0.25*this_ds], [0,0,0], this_ds);
-        counterbore("conical", [-this_e/2,0,this_g-0.25*this_ds], [0,0,0], this_ds);
-    } else if( bolt_counterbore_shape == "cylindrical"){
-        counterbore("cylindrical", [this_e/2,0,this_g - 0.25*this_ds], [0,0,0], this_ds);
-        counterbore("cylindrical", [-this_e/2,0,this_g - 0.25*this_ds], [0,0,0], this_ds);
-    } else if( bolt_counterbore_shape == "hex") {
-        
-    }
+    counterbore(bolt_counterbore_shape, [this_e/2, 0, this_g - 0.25*this_ds], [0, 0, 0], this_ds);
+        counterbore(bolt_counterbore_shape, [-this_e/2, 0, this_g - 0.25*this_ds], [0, 0, 0], this_ds);
+    
+    // bearing seat countersink
+    counterbore("conical", [0,-0.6*this_b ,this_h], [90,0,0], D);
+    counterbore("conical", [0,0.6*this_b,this_h], [270,0,0], D);
 }
